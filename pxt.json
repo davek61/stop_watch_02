@@ -1,5 +1,6 @@
 {
     "name": "Stop_Watch_02",
+    "version": "0.1.0",
     "description": "",
     "dependencies": {
         "core": "*",
