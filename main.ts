@@ -29,6 +29,8 @@ function SetRGB () {
         }
         range.setPixelColor(x, neopixel.rgb(red, green, blue))
         strip.show()
+        x += 1
+        basic.pause(1000)
     }
 }
 // Calculates the number of the Green pixel that is representing the Hour Hand. It does this by first convertimg from 24 hour to 12 hour clock. It then multiplies the hour number by 5. Finally it adds an additional number between 1 and 4 depending on how far through the hour we are. i.e. if we are 48 or more minutes through the hour it adds an extra four.
@@ -173,16 +175,13 @@ loops.everyInterval(1000, function () {
 })
 // This forever loop will only do something if the STOP boolean variable is true. The value of STOP is set TRUE by Button A and FALSE by Button B. 
 // If STOP is FALSE the  code runs which first displays the minute value on the microbit display.
-// It then calls the SetRGB function which calculates the RGB colours of each "second" pixel at position x. These are calculated using the lookup values in the SetRGBList Function.  It then applies the RGB value to the pixel at position x.
-// Next the loop increments x and impliments a 1 second pause
-// Finally the loop deals with what happens if x has reached 60, namely clear the pixels and increment the minute value
+// It then calls the SetRGB loop function which calculates the RGB colours of each "second" pixel at position x. These are calculated using the lookup values in the SetRGBList Function.  It then applies the RGB value to the pixel at position x. It then increments x, implements a 1 second pause and then goes back to the top of the loop.
+// Finally the forever loop deals with what happens if x has reached 60, namely clear the pixels and increment the minute value
 basic.forever(function () {
     strip.setBrightness(60)
     if (STOP == false) {
         basic.showNumber(minute)
         SetRGB()
-        x += 1
-        basic.pause(1000)
         if (x == 60) {
             strip.showColor(neopixel.colors(NeoPixelColors.Black))
             strip.show()
