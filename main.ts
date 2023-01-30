@@ -29,8 +29,6 @@ function SetRGB () {
         }
         range.setPixelColor(x, neopixel.rgb(red, green, blue))
         strip.show()
-        x += 1
-        basic.pause(1000)
     }
 }
 // Calculates the number of the Green pixel that is representing the Hour Hand. It does this by first convertimg from 24 hour to 12 hour clock. It then multiplies the hour number by 5. Finally it adds an additional number between 1 and 4 depending on how far through the hour we are. i.e. if we are 48 or more minutes through the hour it adds an extra four.
@@ -48,6 +46,8 @@ function HourHand (num: number, num2: number) {
         Mins = 2
     } else if (num2 > 11) {
         Mins = 1
+    } else {
+        Mins = 0
     }
     HourPixel = Hour + Mins
 }
@@ -137,10 +137,8 @@ function SetRGBList () {
     255
     ]
 }
-let inc = 0
 let minute = 0
 let HourPixel = 0
-let Mins = 0
 let Hour = 0
 let blue = 0
 let list: number[] = []
@@ -149,12 +147,14 @@ let red = 0
 let range: neopixel.Strip = null
 let haloDisplay: kitronik_halo_hd.ZIPHaloHd = null
 let strip: neopixel.Strip = null
+let Mins = 0
 let x = 0
 let STOP = false
 basic.showString(kitronik_halo_hd.readTime())
 basic.showString(kitronik_halo_hd.readDate())
 STOP = true
 x = 0
+Mins = 0
 strip = neopixel.create(DigitalPin.P8, 60, NeoPixelMode.RGB)
 haloDisplay = kitronik_halo_hd.createZIPHaloDisplay(60)
 basic.pause(2000)
@@ -162,6 +162,8 @@ range = strip.range(0, 60)
 strip.setBrightness(255)
 strip.show()
 SetRGBList()
+// This loop runs once a second.  
+// If the stopwatch second count (x)  is zero (i.e. stopwatch is not running) then it will calculate the positions of the Hour (Green) and Minute (Red) LEDs using the HourHand function and then update these pixels using the Tick function
 loops.everyInterval(1000, function () {
     if (x == 0) {
         strip.setBrightness(30)
@@ -169,18 +171,23 @@ loops.everyInterval(1000, function () {
         Tick(kitronik_halo_hd.readTimeParameter(TimeParameter.Minutes), HourPixel)
     }
 })
+// This forever loop will only do something if the STOP boolean variable is true. The value of STOP is set TRUE by Button A and FALSE by Button B. 
+// If STOP is FALSE the  code runs which first displays the minute value on the microbit display.
+// It then calls the SetRGB function which calculates the RGB colours of each "second" pixel at position x. These are calculated using the lookup values in the SetRGBList Function.  It then applies the RGB value to the pixel at position x.
+// Next the loop increments x and impliments a 1 second pause
+// Finally the loop deals with what happens if x has reached 60, namely clear the pixels and increment the minute value
 basic.forever(function () {
     strip.setBrightness(60)
     if (STOP == false) {
         basic.showNumber(minute)
         SetRGB()
+        x += 1
+        basic.pause(1000)
         if (x == 60) {
             strip.showColor(neopixel.colors(NeoPixelColors.Black))
             strip.show()
             minute += 1
             x = 0
         }
-    } else {
-        inc += 1
     }
 })
